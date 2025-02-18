@@ -1,0 +1,1 @@
+<view class="container"><view class="button-container"><button class="start-button" bindtap="{{a}}">去背单词</button></view></view>

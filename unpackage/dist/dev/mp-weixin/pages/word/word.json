@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "背单词",
+  "usingComponents": {
+    "word-card": "../../components/WordCard"
+  }
+}

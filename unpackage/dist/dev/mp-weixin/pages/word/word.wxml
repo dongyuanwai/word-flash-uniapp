@@ -1,0 +1,1 @@
+<view class="word-learning"><word-card wx:if="{{a}}" u-i="6737973f-0" bind:__l="__l"/><view class="navigation-buttons"><button class="nav-btn" bindtap="{{b}}" disabled="{{c}}">上一个</button><button class="nav-btn" bindtap="{{d}}" disabled="{{e}}">下一个</button></view></view>

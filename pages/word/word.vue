@@ -2,12 +2,16 @@
  * @Author: dongyuanwai yuanwaidong@gmail.com
  * @Date: 2025-02-16 22:28:58
  * @LastEditors: dongyuanwai yuanwaidong@gmail.com
- * @LastEditTime: 2025-02-16 22:30:18
+ * @LastEditTime: 2025-02-18 22:32:11
  * @FilePath: \words-flash-uniapp\pages\word\word.vue
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
 <template>
-  <view class="word-learning">
+  <view 
+    class="word-learning"
+    @touchstart="handleTouchStart"
+    @touchend="handleTouchEnd"
+  >
     <word-card v-if="currentWord" />
     
     <!-- 添加导航按钮 -->
@@ -28,7 +32,7 @@
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import WordCard from '@/components/WordCard.vue'
 import { useWordStore } from '@/store/word'
 
@@ -36,6 +40,33 @@ const store = useWordStore()
 const currentWord = computed(() => store.currentWord)
 const currentIndex = computed(() => store.currentIndex)
 const totalWords = computed(() => store.totalWords)
+
+// 触摸相关状态
+const touchStartX = ref(0)
+const touchEndX = ref(0)
+const minSwipeDistance = 50 // 最小滑动距离
+
+// 处理触摸开始
+const handleTouchStart = (event) => {
+  touchStartX.value = event.touches[0].clientX
+}
+
+// 处理触摸结束
+const handleTouchEnd = (event) => {
+  touchEndX.value = event.changedTouches[0].clientX
+  const swipeDistance = touchEndX.value - touchStartX.value
+
+  // 判断滑动方向和距离
+  if (Math.abs(swipeDistance) >= minSwipeDistance) {
+    if (swipeDistance > 0 && currentIndex.value > 0) {
+      // 向右滑动，显示上一个
+      store.previousWord()
+    } else if (swipeDistance < 0 && currentIndex.value < totalWords.value - 1) {
+      // 向左滑动，显示下一个
+      store.nextWord()
+    }
+  }
+}
 
 // 加载单词列表
 onMounted(() => {
@@ -55,6 +86,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  touch-action: pan-x; /* 优化触摸体验 */
 }
 
 .navigation-buttons {

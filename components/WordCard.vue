@@ -2,7 +2,13 @@
   <!-- 整体容器 -->
   <view class="container">
     <!-- 单词卡片主体 -->
-    <view class="word-card">
+    <view 
+      class="word-card"
+      :class="[
+        'slide-' + slideDirection,
+        { 'sliding': isSliding }
+      ]"
+    >
       <view class="word-content">
         <!-- 英文单词展示区域，带动画效果 -->
         <view class="word">
@@ -41,7 +47,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted, watch } from 'vue'
 import { useWordStore } from '@/store/word'
 
 // 获取状态管理实例
@@ -56,6 +62,28 @@ const wordLetters = computed(() => word.value ? word.value.word.split('') : [])
 const animationTypes = ['pop', 'jump', 'flip', 'blink', 'all']
 // 当前选中的动画类型
 const currentAnimation = ref('pop')
+
+// 动画相关状态
+const slideDirection = ref('none')
+const isSliding = ref(false)
+
+// 监听单词索引变化
+watch(() => store.currentIndex, (newIndex, oldIndex) => {
+  if (newIndex > oldIndex) {
+    // 向左滑动
+    slideDirection.value = 'left'
+  } else if (newIndex < oldIndex) {
+    // 向右滑动
+    slideDirection.value = 'right'
+  }
+  
+  // 触发滑动动画
+  isSliding.value = true
+  setTimeout(() => {
+    isSliding.value = false
+    slideDirection.value = 'none'
+  }, 300) // 动画持续时间
+})
 
 // 切换动画效果
 const changeAnimation = (type) => {
@@ -95,6 +123,10 @@ onUnmounted(() => {
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
   padding: 60rpx 40rpx;
   width: 100%;
+  position: relative;
+  transition: all 0.3s ease-out;
+  transform: translateX(0);
+  opacity: 1;
 }
 
 /* 卡片内容布局 */
@@ -236,5 +268,74 @@ onUnmounted(() => {
   text-align: center;
   padding-top: 20rpx;
   border-top: 1rpx solid #eee; /* 添加顶部分隔线 */
+}
+
+/* 滑动动画相关样式 */
+.word-card {
+  position: relative;
+  transition: all 0.3s ease-out;
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* 向左滑动 */
+.word-card.slide-left.sliding {
+  animation: slideLeft 0.3s ease-out;
+}
+
+/* 向右滑动 */
+.word-card.slide-right.sliding {
+  animation: slideRight 0.3s ease-out;
+}
+
+@keyframes slideLeft {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(-50%);
+    opacity: 0;
+  }
+  51% {
+    transform: translateX(50%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideRight {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(50%);
+    opacity: 0;
+  }
+  51% {
+    transform: translateX(-50%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* 优化卡片样式 */
+.word-card {
+  background: white;
+  border-radius: 20rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+  padding: 40rpx;
+  width: 80%;
+  max-width: 600rpx;
+  margin: 0 auto;
+  transform-origin: center center;
+  will-change: transform, opacity;
 }
 </style>

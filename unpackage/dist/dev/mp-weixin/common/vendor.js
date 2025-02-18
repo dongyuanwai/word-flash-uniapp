@@ -8416,4 +8416,5 @@ exports.onUnmounted = onUnmounted;
 exports.ref = ref;
 exports.t = t;
 exports.unref = unref;
+exports.watch = watch;
 //# sourceMappingURL=../../.sourcemap/mp-weixin/common/vendor.js.map
